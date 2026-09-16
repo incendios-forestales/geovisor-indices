@@ -16,6 +16,9 @@ SITIO <- "https://incendios-forestales.github.io/anomalias-termicas-costarica/"
 
 ui <- bslib::page_navbar(
   title = "Temporada de fuego en Costa Rica: índices",
+  # Sin relleno vertical: cada gráfico conserva su altura y la página se
+  # desplaza, en vez de repartir la ventana entre las tarjetas.
+  fillable = FALSE,
   theme = bslib::bs_theme(version = 5, bootswatch = "flatly", primary = COLOR_DETECCIONES),
   sidebar = bslib::sidebar(
     width = 260, open = "always",

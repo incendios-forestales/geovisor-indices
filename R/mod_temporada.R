@@ -49,17 +49,18 @@ mod_temporada_server <- function(id, datos, plataforma) {
       t <- datos$datos[[plataforma()]]$temporada_anual
       ok <- t[t$confiable, ]
       p <- info()
+      # paste0: los argumentos de tags$p se separan con espacios.
       shiny::tags$div(class = "small",
         shiny::tags$p(shiny::tags$strong(p$etiqueta), shiny::tags$br(),
-                      "Registro desde ", fecha_es(p$registro_inicio), "; ",
-                      "estándar hasta ", fecha_es(p$fin_estandar), "."),
-        shiny::tags$p(nrow(ok), " años completos (", min(ok$anio_fuego), "–",
-                      max(ok$anio_fuego), "). Longitud media ",
-                      num_es(mean(ok$lon), 0), " días; inicio mediano el ",
-                      dia_es(stats::median(ok$ini_dia)), " y fin mediano el ",
-                      dia_es(stats::median(ok$fin_dia)), "."),
-        shiny::tags$p("Periodo base de los índices de conteo: ",
-                      p$base_inicio, "–", p$base_fin, ".")
+                      paste0("Registro desde ", fecha_es(p$registro_inicio),
+                             "; estándar hasta ", fecha_es(p$fin_estandar), ".")),
+        shiny::tags$p(paste0(nrow(ok), " años completos (", min(ok$anio_fuego), "–",
+                             max(ok$anio_fuego), "). Longitud media ",
+                             num_es(mean(ok$lon), 0), " días; inicio mediano el ",
+                             dia_es(stats::median(ok$ini_dia)), " y fin mediano el ",
+                             dia_es(stats::median(ok$fin_dia)), ".")),
+        shiny::tags$p(paste0("Periodo base de los índices de conteo: ",
+                             p$base_inicio, "–", p$base_fin, "."))
       )
     })
 
@@ -114,7 +115,7 @@ mod_temporada_server <- function(id, datos, plataforma) {
       plotly::plot_ly(
         x = t$anio_fuego, y = valor, type = "bar",
         marker = list(color = ifelse(t$confiable, COLOR_DETECCIONES, COLOR_RESERVA)),
-        hoverinfo = "text",
+        hoverinfo = "text", textposition = "none",
         text = paste0("<b>", t$anio_fuego, "</b><br>", fila$rotulo, ": ", texto,
                       ifelse(t$nota == "", "", paste0("<br><i>", t$nota, "</i>")))
       ) |>
