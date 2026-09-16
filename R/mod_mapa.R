@@ -22,21 +22,24 @@ LON_TOPE <- 180L                 # como RASTER_LON_TOPE del pipeline
 COLOR_SIN_ESTACION <- "#6baed6"
 COLOR_BAJO_UMBRAL  <- "#d9d9d9"
 
+# El módulo tiene dos piezas de interfaz: los controles, que van en el panel
+# lateral de la app bajo el selector de plataforma, y el mapa, que ocupa
+# todo el resto de la ventana. Comparten el mismo `id`.
+mod_mapa_panel_ui <- function(id) {
+  ns <- shiny::NS(id)
+  shiny::tagList(
+    shiny::selectInput(ns("indice"), "Índice por celda",
+                       choices = stats::setNames(INDICES_CELDA$columna, INDICES_CELDA$rotulo),
+                       selected = "lon"),
+    shiny::uiOutput(ns("descripcion")),
+    shiny::tags$hr(),
+    shiny::uiOutput(ns("ficha"))
+  )
+}
+
 mod_mapa_ui <- function(id) {
   ns <- shiny::NS(id)
-  bslib::layout_sidebar(
-    fillable = TRUE,
-    sidebar = bslib::sidebar(
-      width = 320, open = "always",
-      shiny::selectInput(ns("indice"), "Índice por celda",
-                         choices = stats::setNames(INDICES_CELDA$columna, INDICES_CELDA$rotulo),
-                         selected = "lon"),
-      shiny::uiOutput(ns("descripcion")),
-      shiny::tags$hr(),
-      shiny::uiOutput(ns("ficha"))
-    ),
-    leaflet::leafletOutput(ns("mapa"), height = "100%")
-  )
+  leaflet::leafletOutput(ns("mapa"), height = "100%")
 }
 
 # Descripción corta de cada índice para el panel (README del pipeline).

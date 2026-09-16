@@ -19,15 +19,18 @@ ui <- bslib::page_navbar(
   # Relleno vertical: el mapa ocupa toda la altura de la ventana.
   fillable = TRUE,
   theme = bslib::bs_theme(version = 5, bootswatch = "flatly", primary = COLOR_DETECCIONES),
+  # Un solo panel lateral: plataforma, controles del mapa y créditos; el
+  # mapa ocupa todo el resto.
   sidebar = bslib::sidebar(
-    width = 260, open = "always",
+    width = 320, open = "always",
     shiny::selectInput("plataforma", "Plataforma",
                        choices = stats::setNames(DATOS$plataformas$clave,
                                                  DATOS$plataformas$etiqueta)),
+    mod_mapa_panel_ui("mapa"),
+    shiny::tags$hr(),
     shiny::tags$p(class = "small text-muted",
       "Las plataformas se muestran por separado y nunca se suman: cada sensor ",
       "ve el fuego con su píxel y sus horas de paso."),
-    shiny::tags$hr(),
     shiny::tags$p(class = "small text-muted",
       "Datos: corrida del ", fecha_es(DATOS$manifiesto$corrida), " del ",
       shiny::tags$a(href = SITIO, target = "_blank", "pipeline anomalias-termicas-costarica"),
