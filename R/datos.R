@@ -72,5 +72,7 @@ cargar_datos <- function(dir = "data") {
     )
   })
   list(manifiesto = m, plataformas = suite, datos = por_plataforma,
-       geometrias = list(pais = leer_geometria("pais", dir)))
+       geometrias = list(pais = leer_geometria("pais", dir),
+                         grilla = leer_geometria("grilla_analisis", dir),
+                         areas_conservacion = leer_geometria("areas_conservacion", dir)))
 }

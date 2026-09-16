@@ -34,6 +34,18 @@ test_that("cargar_datos reúne todas las tablas por plataforma", {
   expect_true(all(c("temporada_anual", "temporada_celdas", "temporada_ac_anual",
                     "enso_anual", "fuentes_estaticas") %in% names(d$datos$snpp)))
   expect_s3_class(d$geometrias$pais, "sf")
+  # La grilla y la tabla por celda comparten la llave.
+  g <- d$geometrias$grilla
+  expect_equal(nrow(g), 523L)
+  expect_true(all(d$datos$modis$temporada_celdas$celda_id %in% g$celda_id))
+  expect_equal(nrow(d$geometrias$areas_conservacion), 10L)
+})
+
+test_that("los índices del mapa existen en la tabla por celda", {
+  source(file.path(RAIZ, "R", "mod_mapa.R"))
+  t <- leer_tabla("modis", "temporada_celdas.csv", DIR)
+  expect_true(all(INDICES_CELDA$columna %in% names(t)))
+  expect_true(all(c("valida", "sin_estacion", "anio_inicio", "base_inicio") %in% names(t)))
 })
 
 test_that("los formatos en español funcionan", {

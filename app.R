@@ -16,9 +16,8 @@ SITIO <- "https://incendios-forestales.github.io/anomalias-termicas-costarica/"
 
 ui <- bslib::page_navbar(
   title = "Temporada de fuego en Costa Rica: índices",
-  # Sin relleno vertical: cada gráfico conserva su altura y la página se
-  # desplaza, en vez de repartir la ventana entre las tarjetas.
-  fillable = FALSE,
+  # Relleno vertical: el mapa ocupa toda la altura de la ventana.
+  fillable = TRUE,
   theme = bslib::bs_theme(version = 5, bootswatch = "flatly", primary = COLOR_DETECCIONES),
   sidebar = bslib::sidebar(
     width = 260, open = "always",
@@ -35,21 +34,18 @@ ui <- bslib::page_navbar(
       " (contrato ", DATOS$manifiesto$contrato, "). Índices de vegetación de NASA FIRMS; ",
       "definiciones en el ",
       shiny::tags$a(href = "https://github.com/incendios-forestales/anomalias-termicas-costarica#año-de-fuego-e-índices-anuales",
-                    target = "_blank", "README"), ".")
+                    target = "_blank", "README"), "."),
+    shiny::tags$p(class = "small text-muted",
+      "Escuela de Geografía, Universidad de Costa Rica.")
   ),
-  bslib::nav_panel("Temporada anual", mod_temporada_ui("temporada")),
-  bslib::nav_panel("Celdas", shiny::tags$p(class = "p-3 text-muted", "Próximamente: índices consolidados por celda de 0,1° en un mapa interactivo.")),
-  bslib::nav_panel("Áreas de conservación", shiny::tags$p(class = "p-3 text-muted", "Próximamente: índices por área de conservación y año.")),
-  bslib::nav_panel("Comparación", shiny::tags$p(class = "p-3 text-muted", "Próximamente: comparación entre plataformas en el traslape.")),
-  bslib::nav_panel("ENSO", shiny::tags$p(class = "p-3 text-muted", "Próximamente: índices anuales según la fase ENSO.")),
-  bslib::nav_panel("Fuentes estáticas", shiny::tags$p(class = "p-3 text-muted", "Próximamente: mapa de fuentes estáticas.")),
+  bslib::nav_panel("Mapa", mod_mapa_ui("mapa")),
   bslib::nav_spacer(),
   bslib::nav_item(shiny::tags$a(href = SITIO, target = "_blank", "Reportes"))
 )
 
 server <- function(input, output, session) {
   plataforma <- shiny::reactive(input$plataforma)
-  mod_temporada_server("temporada", DATOS, plataforma)
+  mod_mapa_server("mapa", DATOS, plataforma)
 }
 
 shiny::shinyApp(ui, server)
