@@ -31,7 +31,7 @@ separado con un selector global y nunca se mezclan, como en el pipeline.
 ├── app.R                 # interfaz (bslib) y servidor: una pestaña por módulo
 ├── R/datos.R             # lectura del manifiesto, las tablas y las geometrías
 ├── R/utils.R             # formato en español, año de fuego, índices y colores
-├── R/mod_mapa.R          # pestaña «Mapa»: índices por celda en leaflet
+├── R/mod_mapa.R          # pestaña «Mapa»: índices por celda y por AC en leaflet
 ├── R/mod_temporada.R     # temporada anual (se conectará más adelante)
 ├── actualizar_datos.R    # descarga y verifica la instantánea de data/
 ├── data/                 # instantánea de outputs/ del pipeline (versionada)
@@ -59,18 +59,26 @@ actualizar la instantánea y correr las pruebas.
 
 ## El mapa
 
-La portada es un mapa interactivo (leaflet) de los **índices consolidados
-por celda de 0,1°** de la plataforma elegida: longitud, inicio y fin de la
-temporada, fracción fuera de diciembre a mayo, concentración, frecuencia,
-densidad, intensidad y, en MODIS, la fracción de Aqua. Un selector cambia
-el índice; la leyenda, la barra de escala y la ficha por celda (con todos
-los índices y sus marcas) acompañan. Capas base sin clave de API (CartoDB,
-OpenStreetMap, imágenes de Esri) y el límite nacional como capa.
+La portada es un mapa interactivo (leaflet) de los **índices consolidados**
+de la plataforma elegida, a dos escalas que se cambian con un selector:
 
-En pasos siguientes se añadirán, en el mismo mapa, la coropleta por área
-de conservación, el acuerdo entre plataformas y las fuentes estáticas, y
-después las vistas no cartográficas (temporada anual, ENSO). El módulo de
-temporada anual ya existe en `R/mod_temporada.R` y se conectará entonces.
+- **Celdas de 0,1°**: longitud, inicio y fin de la temporada, fracción
+  fuera de diciembre a mayo, concentración, frecuencia, densidad,
+  intensidad y, en MODIS, la fracción de Aqua.
+- **Áreas de conservación** (SINAC): los mismos índices consolidados por
+  AC, que el pipeline calcula con las mismas funciones y umbrales tomando
+  cada AC como una celda con su superficie terrestre; sin FREC, porque
+  todas las AC arden todos los años.
+
+Un selector cambia el índice; la leyenda, la barra de escala y la ficha
+por unidad (con todos los índices y sus marcas) acompañan. Capas base sin
+clave de API (Esri gris, OpenStreetMap, OpenTopoMap, imágenes de Esri) y el
+límite nacional como capa.
+
+En pasos siguientes se añadirán, en el mismo mapa, el acuerdo entre
+plataformas y las fuentes estáticas, y después las vistas no cartográficas
+(temporada anual, ENSO). El módulo de temporada anual ya existe en
+`R/mod_temporada.R` y se conectará entonces.
 
 ## Fuentes
 

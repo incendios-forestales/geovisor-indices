@@ -51,7 +51,29 @@ leer_tabla <- function(clave, nombre, dir = "data") {
 }
 
 leer_geometria <- function(nombre, dir = "data") {
-  sf::st_read(file.path(dir, "geometrias", paste0(nombre, ".geojson")), quiet = TRUE)
+  solo_poligonos(sf::st_read(file.path(dir, "geometrias", paste0(nombre, ".geojson")), quiet = TRUE))
+}
+
+# Deja solo la parte poligonal de cada geometría, como MULTIPOLYGON. El
+# recorte al país deja en algunas AC colecciones con líneas o puntos de
+# borde que leaflet::addPolygons no sabe dibujar; los atributos y el orden
+# no cambian.
+solo_poligonos <- function(g) {
+  geom <- sf::st_geometry(g)
+  es_coleccion <- sf::st_is(geom, "GEOMETRYCOLLECTION")
+  if (any(es_coleccion)) {
+    geom[es_coleccion] <- sf::st_sfc(lapply(geom[es_coleccion], function(x) {
+      sf::st_union(sf::st_sfc(poligonos_de(x)))[[1]]
+    }), crs = sf::st_crs(geom))
+  }
+  sf::st_set_geometry(g, sf::st_cast(geom, "MULTIPOLYGON"))
+}
+
+# Lista de los POLYGON y MULTIPOLYGON de una geometría sfg, entrando en las
+# colecciones anidadas (las hay en el GeoJSON de las AC).
+poligonos_de <- function(x) {
+  if (inherits(x, "GEOMETRYCOLLECTION")) return(unlist(lapply(x, poligonos_de), recursive = FALSE))
+  if (inherits(x, c("POLYGON", "MULTIPOLYGON"))) list(x) else list()
 }
 
 # Todo lo que la app necesita al arrancar, por plataforma de la suite. Las

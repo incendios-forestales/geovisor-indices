@@ -41,11 +41,38 @@ test_that("cargar_datos reúne todas las tablas por plataforma", {
   expect_equal(nrow(d$geometrias$areas_conservacion), 10L)
 })
 
-test_that("los índices del mapa existen en la tabla por celda", {
+test_that("los índices del mapa existen en las tablas de cada escala", {
   source(file.path(RAIZ, "R", "mod_mapa.R"))
   t <- leer_tabla("modis", "temporada_celdas.csv", DIR)
-  expect_true(all(INDICES_CELDA$columna %in% names(t)))
+  expect_true(all(INDICES_MAPA$columna %in% names(t)))
   expect_true(all(c("valida", "sin_estacion", "anio_inicio", "base_inicio") %in% names(t)))
+  # Escala de AC: los índices marcados `ac` (todos menos FREC), la llave y
+  # el nombre están en el consolidado, para las tres plataformas.
+  for (k in c("modis", "snpp", "noaa20")) {
+    a <- leer_tabla(k, "temporada_ac_consolidado.csv", DIR)
+    expect_true(all(INDICES_MAPA$columna[INDICES_MAPA$ac] %in% names(a)), info = k)
+    expect_false("frec" %in% names(a), info = k)
+    expect_true(all(c("siglas_ac", "nombre_ac", "area_km2", "valida", "sin_estacion") %in% names(a)))
+    expect_equal(nrow(a), 10L, info = k)
+  }
+  expect_false(INDICES_MAPA$ac[INDICES_MAPA$columna == "frec"])
+  expect_true(all(setdiff(INDICES_MAPA$columna, "frec") %in% names(DESCRIPCION_INDICE$ac)))
+  expect_true(all(INDICES_MAPA$columna %in% names(DESCRIPCION_INDICE$celdas)))
+})
+
+test_that("la geometría de las AC y el consolidado comparten la llave", {
+  d <- cargar_datos(DIR)
+  g <- d$geometrias$areas_conservacion
+  a <- d$datos$modis$temporada_ac_consolidado
+  expect_setequal(g$siglas_ac, a$siglas_ac)
+  # Solo polígonos: leaflet no dibuja colecciones (el GeoJSON publicado
+  # trae alguna por el recorte al país).
+  expect_true(all(sf::st_is(g, "MULTIPOLYGON")))
+  expect_true(all(sf::st_is(d$geometrias$grilla, "MULTIPOLYGON")))
+  # El nombre y la superficie de la geometría coinciden con los de la tabla.
+  u <- dplyr::left_join(sf::st_drop_geometry(g), a, by = "siglas_ac")
+  expect_equal(u$nombre_ac.x, u$nombre_ac.y)
+  expect_equal(u$area_km2.x, u$area_km2.y)
 })
 
 test_that("los formatos en español funcionan", {
