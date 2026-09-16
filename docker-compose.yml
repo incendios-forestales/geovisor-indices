@@ -1,0 +1,36 @@
+name: geovisor-indices
+services:
+  # La app en http://localhost:3838
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: geovisor-indices:local
+    container_name: geovisor-indices-app
+    user: "1000:1000"
+    environment:
+      HOME: /home/rstudio
+      TZ: ${TZ:-America/Costa_Rica}
+    ports:
+      - "3838:3838"
+    volumes:
+      - .:/home/rstudio/project
+      - renv-cache:/home/rstudio/.cache/R/renv
+    working_dir: /home/rstudio/project
+    command: Rscript -e "shiny::runApp('.', host = '0.0.0.0', port = 3838)"
+
+  # Utilidad para scripts (actualizar datos, pruebas, despliegue):
+  #   docker compose run --rm dev Rscript actualizar_datos.R
+  dev:
+    image: geovisor-indices:local
+    user: "1000:1000"
+    environment:
+      HOME: /home/rstudio
+      TZ: ${TZ:-America/Costa_Rica}
+    volumes:
+      - .:/home/rstudio/project
+      - renv-cache:/home/rstudio/.cache/R/renv
+    working_dir: /home/rstudio/project
+
+volumes:
+  renv-cache:
