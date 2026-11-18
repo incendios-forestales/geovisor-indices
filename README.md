@@ -53,9 +53,24 @@ docker compose up app                                         # http://localhost
 
 ## Despliegue
 
-En shinyapps.io, cuenta `incendios-forestales`, con rsconnect desde el
-servicio `dev` (las credenciales no se versionan). Antes de desplegar,
+Publicado en <https://incendios-forestales.shinyapps.io/geovisor-indices/>
+(shinyapps.io, cuenta `incendios-forestales`), con rsconnect desde el
+servicio `dev`. Las credenciales no se versionan: se montan en solo lectura
+desde la carpeta de cuentas de rsconnect de la máquina, junto con una
+carpeta escribible para el historial de despliegues (sin ella rsconnect
+crea la app y falla antes de subir el código). Antes de desplegar,
 actualizar la instantánea y correr las pruebas.
+
+```bash
+docker compose run --rm \
+  -v <cuentas-rsconnect>:/home/rstudio/.config/R/rsconnect/accounts:ro \
+  -v <carpeta-temporal>:/home/rstudio/.config/R/rsconnect/deployments \
+  dev Rscript -e "rsconnect::deployApp(appDir = '.', \
+    appFiles = c('app.R', list.files('R', full.names = TRUE), \
+                 list.files('data', recursive = TRUE, full.names = TRUE)), \
+    appName = 'geovisor-indices', account = 'incendios-forestales', \
+    server = 'shinyapps.io', launch.browser = FALSE, forceUpdate = TRUE)"
+```
 
 ## El mapa
 

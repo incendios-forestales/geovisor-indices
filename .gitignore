@@ -12,3 +12,4 @@ renv/staging/
 .Renviron
 tests/testthat/_snaps/
 *.log
+rsconnect/
